@@ -3,19 +3,15 @@ package main
 import (
 	"fmt"
 	"net/http"
-
-	"github.com/spf13/viper"
 )
 
 func main() {
-	// Set the file name of the configuration file
-	viper.SetConfigName("config")
-
 	handler := http.NewServeMux()
 	handler.HandleFunc("/", root)
 	handler.HandleFunc("/api/data", processdata)
 
-	http.ListenAndServe("0.0.0.0:8080", handler)
+	configuration := BuildConfigurations("config", "yml")
+	http.ListenAndServe(configuration.Server.Address, handler)
 }
 
 func root(w http.ResponseWriter, r *http.Request) {

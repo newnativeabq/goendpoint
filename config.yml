@@ -1,10 +1,11 @@
 server:
   port: 8080
+  address: "0.0.0.0:8080"
 
 database:
-  dbname: "dbname"
+  dbname: 
   dbuser: "dbuser"
   dbpassword: "dbpassword"
 
-EXAMPLE_VAR: "variable from config.yml"
-EXAMPLE_PATH: "path from config.yml"
+# EXAMPLE_VAR: "variable from config.yml"
+# EXAMPLE_PATH: "path from config.yml"
