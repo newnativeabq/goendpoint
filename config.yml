@@ -3,9 +3,12 @@ server:
   address: "0.0.0.0:8080"
 
 database:
-  dbname: 
-  dbuser: "dbuser"
+  dbname: "postgres"
+  dbuser: "app"
   dbpassword: "dbpassword"
+  dbhost: "localhost"
+  dbport: 5432
+  dbtype: "postgres"
 
 # EXAMPLE_VAR: "variable from config.yml"
 # EXAMPLE_PATH: "path from config.yml"

@@ -25,6 +25,9 @@ type DatabaseConfigurations struct {
 	DBName     string
 	DBUser     string
 	DBPassword string
+	DBHost     string
+	DBPort     int
+	DBType     string
 }
 
 // BuildConfigurations generates configurations structure from .yml file
