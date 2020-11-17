@@ -10,10 +10,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var (
-	ctx context.Context
-)
-
 type dpacket struct {
 	sid   string
 	time  time.Time
@@ -34,7 +30,6 @@ func GetDB(dc DatabaseConfigurations) *sql.DB {
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
 
 	err = db.Ping()
 	if err != nil {
@@ -51,10 +46,11 @@ func GetDB(dc DatabaseConfigurations) *sql.DB {
 //		time: timestamp
 //		value: sensor value
 func WriteData(db *sql.DB, dp dpacket) error {
-	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
+	rootCtx := context.Background()
+	ctx, cancel := context.WithTimeout(rootCtx, 1*time.Second)
 	defer cancel()
 
-	query := fmt.Sprintf("INSERT INTO data.sdata(sid, time, value) VALUES (?, ?, ?)")
+	query := fmt.Sprintf("INSERT INTO data.sdata(sid, time, value) VALUES ($1, $2, $3)")
 	statement, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Printf("Error %s when preparing SQL statement", err)
