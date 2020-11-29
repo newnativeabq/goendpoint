@@ -10,10 +10,17 @@ import (
 	_ "github.com/lib/pq"
 )
 
+type fileAttachment struct {
+	name     string
+	content  byte
+	fileType string
+}
+
 type dpacket struct {
-	sid   string
-	time  time.Time
-	value int
+	sid        string
+	time       time.Time
+	value      int
+	attachment fileAttachment
 }
 
 // MakePSQLString Make a connection string for PostgreSQL database

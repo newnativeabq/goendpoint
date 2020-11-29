@@ -31,14 +31,19 @@ func root(w http.ResponseWriter, r *http.Request) {
 
 func dataHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		r.ParseForm()
+		err := r.ParseMultipartForm(32 << 20)
+		if err != nil {
+			r.ParseForm()
+			log.Printf("Error %s.  Could not parse multipart Form.", err)
+		}
+
 		var dp dpacket
 		dp.sid = r.FormValue("sid")
 		dp.time = time.Now()
 		dp.value, _ = strconv.Atoi(r.FormValue("value"))
-		// attachment := r.FormValue("attachment")
+		// dp.attachment = r.FormV
 
-		err := WriteData(db, dp)
+		err = WriteData(db, dp)
 		if err != nil {
 			log.Printf("Error %s. Could not write to database.", err)
 		}
