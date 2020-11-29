@@ -13,7 +13,7 @@ import (
 
 type fileAttachment struct {
 	header *multipart.FileHeader
-	file   multipart.File
+	file   []byte
 }
 
 type dpacket struct {
@@ -57,14 +57,14 @@ func WriteData(db *sql.DB, dp dpacket) error {
 	ctx, cancel := context.WithTimeout(rootCtx, 1*time.Second)
 	defer cancel()
 
-	query := fmt.Sprintf("INSERT INTO data.sdata(sid, time, value) VALUES ($1, $2, $3)")
+	query := fmt.Sprintf("INSERT INTO data.sdata(sid, time, value, attachment) VALUES ($1, $2, $3, $4)")
 	statement, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Printf("Error %s when preparing SQL statement", err)
 		return err
 	}
 	defer statement.Close()
-	res, err := statement.ExecContext(ctx, dp.sid, dp.time, dp.value)
+	res, err := statement.ExecContext(ctx, dp.sid, dp.time, dp.value, dp.attachment.file)
 	if err != nil {
 		log.Printf("Error %s when inserting row into data.sdata", err)
 		return err

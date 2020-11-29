@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -40,7 +42,7 @@ func dataHandler(db *sql.DB) http.HandlerFunc {
 		dp.sid = r.FormValue("sid")
 		dp.time = time.Now()
 		dp.value, _ = strconv.Atoi(r.FormValue("value"))
-		dp.attachment = getFileFromRequest(r, "file")
+		dp.attachment, err = getFileFromRequest(r, "file")
 
 		err = WriteData(db, dp)
 		if err != nil {
@@ -52,17 +54,24 @@ func dataHandler(db *sql.DB) http.HandlerFunc {
 }
 
 // getFileFromRequest attempts to read file
-func getFileFromRequest(r *http.Request, key string) fileAttachment {
+func getFileFromRequest(r *http.Request, key string) (fileAttachment, error) {
 	var newAttachment fileAttachment
 	file, header, err := r.FormFile(key)
+	defer file.Close()
 
 	if err != nil {
 		log.Printf("r.FormFile failed. %s", err)
-	} else {
-		newAttachment.file = file
-		newAttachment.header = header
-		log.Printf("File detected. Attempting to write with filename %s", header.Filename)
+		return newAttachment, err
 	}
 
-	return newAttachment
+	buf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(buf, file); err != nil {
+		return newAttachment, err
+	}
+
+	newAttachment.file = buf.Bytes()
+	newAttachment.header = header
+	log.Printf("File detected. Attempting to write with filename %s", header.Filename)
+
+	return newAttachment, err
 }
