@@ -33,21 +33,36 @@ func dataHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseMultipartForm(32 << 20)
 		if err != nil {
-			r.ParseForm()
-			log.Printf("Error %s.  Could not parse multipart Form.", err)
+			log.Printf("Error %s.  Could not parse MultipartForm.", err)
 		}
 
 		var dp dpacket
 		dp.sid = r.FormValue("sid")
 		dp.time = time.Now()
 		dp.value, _ = strconv.Atoi(r.FormValue("value"))
-		// dp.attachment = r.FormV
+		dp.attachment = getFileFromRequest(r, "file")
 
 		err = WriteData(db, dp)
 		if err != nil {
 			log.Printf("Error %s. Could not write to database.", err)
 		}
 
-		fmt.Fprintf(w, "Data Received", dp.sid, dp.time, dp.value)
+		log.Printf("Data Received- SID: %s, TIME: %s, VALUE: %d", dp.sid, dp.time, dp.value)
 	}
+}
+
+// getFileFromRequest attempts to read file
+func getFileFromRequest(r *http.Request, key string) fileAttachment {
+	var newAttachment fileAttachment
+	file, header, err := r.FormFile(key)
+
+	if err != nil {
+		log.Printf("r.FormFile failed. %s", err)
+	} else {
+		newAttachment.file = file
+		newAttachment.header = header
+		log.Printf("File detected. Attempting to write with filename %s", header.Filename)
+	}
+
+	return newAttachment
 }

@@ -5,15 +5,15 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"mime/multipart"
 	"time"
 
 	_ "github.com/lib/pq"
 )
 
 type fileAttachment struct {
-	name     string
-	content  byte
-	fileType string
+	header *multipart.FileHeader
+	file   multipart.File
 }
 
 type dpacket struct {

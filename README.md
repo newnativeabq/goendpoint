@@ -31,3 +31,10 @@ Setting up PostgreSQL
 > podman exec -it postgres_db psql -U postgres
 
 > In the db shell: create database sensor_db
+
+
+### Build
+
+Building the program in go
+
+> go build -o SensorEndpoint *.go
