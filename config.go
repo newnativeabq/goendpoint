@@ -8,10 +8,8 @@ import (
 
 // Configurations Exported
 type Configurations struct {
-	Server       ServerConfigurations
-	Database     DatabaseConfigurations
-	EXAMPLE_PATH string
-	EXAMPLE_VAR  string
+	Server   ServerConfigurations
+	Database DatabaseConfigurations
 }
 
 // ServerConfigurations exported

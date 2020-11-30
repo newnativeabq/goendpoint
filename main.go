@@ -16,6 +16,8 @@ import (
 func main() {
 	file, _ := os.OpenFile("info.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	log.SetOutput(file)
+	log.Printf("Server started.")
+
 	config := BuildConfigurations("config", "yml")
 	db := GetDB(config.Database)
 
