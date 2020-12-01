@@ -5,22 +5,16 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"mime/multipart"
 	"time"
 
 	_ "github.com/lib/pq"
 )
 
-type fileAttachment struct {
-	header *multipart.FileHeader
-	file   []byte
-}
-
 type dpacket struct {
 	sid        string
 	time       time.Time
 	value      int
-	attachment fileAttachment
+	attachment []byte
 }
 
 // MakePSQLString Make a connection string for PostgreSQL database
