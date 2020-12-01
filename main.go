@@ -35,16 +35,29 @@ func root(w http.ResponseWriter, r *http.Request) {
 
 func dataHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		var dp dpacket
 		err := r.ParseMultipartForm(0)
 		if err != nil {
 			log.Printf("Error %s.  Could not parse MultipartForm.", err)
 		}
 
-		var dp dpacket
+		file, fh, err := r.FormFile("files")
+		_ = fh
+
+		if err != nil {
+			log.Printf("r.FormFile failed. %s", err)
+		} else {
+			buf := bytes.NewBuffer(nil)
+			if _, err := io.Copy(buf, file); err != nil {
+				log.Printf("Error %s. Could not copy file contents to byte buffer.", err)
+			}
+			dp.attachment = buf.Bytes()
+			file.Close()
+		}
+
 		dp.sid = r.FormValue("sid")
 		dp.time = time.Now()
 		dp.value, _ = strconv.Atoi(r.FormValue("value"))
-		dp.attachment, err = getFileFromRequest(r, "file")
 
 		err = WriteData(db, dp)
 		if err != nil {
@@ -54,26 +67,4 @@ func dataHandler(db *sql.DB) http.HandlerFunc {
 		w.WriteHeader(http.StatusCreated)
 		w.Write([]byte("201 - Successfully Logged Data with DB"))
 	}
-}
-
-// getFileFromRequest attempts to read file
-func getFileFromRequest(r *http.Request, key string) ([]byte, error) {
-	file, _, err := r.FormFile(key)
-	defer file.Close()
-
-	var newAttachment []byte
-
-	if err != nil {
-		log.Printf("r.FormFile failed. %s", err)
-		return newAttachment, err
-	}
-
-	buf := bytes.NewBuffer(nil)
-	if _, err := io.Copy(buf, file); err != nil {
-		return newAttachment, err
-	}
-
-	newAttachment = buf.Bytes()
-
-	return newAttachment, err
 }

@@ -58,7 +58,7 @@ func WriteData(db *sql.DB, dp dpacket) error {
 		return err
 	}
 	defer statement.Close()
-	res, err := statement.ExecContext(ctx, dp.sid, dp.time, dp.value, dp.attachment.file)
+	res, err := statement.ExecContext(ctx, dp.sid, dp.time, dp.value, dp.attachment)
 	if err != nil {
 		log.Printf("Error %s when inserting row into data.sdata", err)
 		return err
